@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kops-virtualservice
+spec:
+  hosts:
+  - {{ .Values.hostName }}  # Change this to your domain
+  gateways:
+  - nginx-gateway
+  http:
+  - route:
+    - destination:
+        host: {{ .Values.hostService }}
+        port:
+          number: {{ .Values.targetPort }}

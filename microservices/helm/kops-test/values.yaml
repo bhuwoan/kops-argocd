@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: latest
+
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 200Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+namespace: default
+restartPolicy: Always
+servicePort: 80
+targetPort: 80
+hostService: kops-test.default.svc.cluster.local
+hostName: test.agroceria.com

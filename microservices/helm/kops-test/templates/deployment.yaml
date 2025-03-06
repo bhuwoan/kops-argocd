@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kops-test
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: kops-test
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: kops-test
+    spec:
+      containers:
+      - name: kops-test
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - containerPort: {{ .Values.servicePort }}
+          name: kops-test-port
+          protocol: TCP
+        resources:
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+
+
+      restartPolicy: {{ .Values.restartPolicy }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kops-test
+  namespace: {{ .Values.namespace }}
+
+  labels:
+    app: kops-test
+spec:
+  selector:
+    app: kops-test
+  ports:
+  - protocol: TCP
+    port: {{ .Values.servicePort }}
+    targetPort: {{ .Values.targetPort }}
