@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: argoapp-nightly
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - git:
+              directories:
+                - path: microservices/helm/kops-test
+               
+              repoURL: git@github.com:bhuwoan/kops-argocd.git
+              revision: nightly
+          - list:
+              elements:
+                - appSuffix: demo
+                  namespace: default
+                  project: default
+                  valuesFile: values.yaml
+  template:
+    metadata:
+      name: '{{path.basename}}-{{appSuffix}}'
+    spec:
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: false
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=false
+      destination:
+        namespace: '{{namespace}}'
+        server: https://kubernetes.default.svc
+      project: '{{project}}'
+      source:
+        helm:
+          releaseName: '{{path.basename}}'
+          valueFiles:
+            - '{{valuesFile}}'
+        # version: 1.0.0
+        path: 'microservices/helm/{{path.basename}}'
+        repoURL: git@github.com:bhuwoan/kops-argocd.git
+        targetRevision: nightly
